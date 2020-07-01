@@ -25,7 +25,7 @@ $(function(){
 
   function nuevos_dulces(columna, fila){
     for (let index = fila; index < 8; index++) {     
-      $('.col-'+columna).prepend('<img src="image/' + numero_aleatorio() + '.png" width="100%" id="imagen-' + String(columna-1) + String(index-1) +'">').hide().slideDown(1000)
+      $('.col-'+columna).prepend('<img src="image/' + numero_aleatorio() + '.png" width="100%" id="imagen-' + String(columna-1) + String(index-1) +'" ondrop="drop(event)" ondragover="allowDrop(event)" draggable="true" ondragstart="drag(event)">').hide().slideDown(1000)
     }
   }
 
@@ -107,7 +107,7 @@ $(function(){
     let matriz = []
     let continua = true
     // Ejecutar hasta que no haya combinaciones
-    while (existen_combinaciones) {
+    //while (existen_combinaciones) {
       matriz = []
       for (let columna = 0; columna < 7; columna++) {
         let aux_matriz = []
@@ -118,7 +118,6 @@ $(function(){
       }
       
       let posiciones = barrido_tablero(matriz)
-      console.log(posiciones);
       
       if (posiciones.length == 0) {
         existen_combinaciones = false
@@ -126,18 +125,35 @@ $(function(){
         posiciones.forEach(element => {
           eliminar_dulce(element.columna, element.fila)
         });
-        sobreescribir_ids()
+        sobreescribir_ids()  
       }
-    }
+    //}
   }
 
   function sobreescribir_ids(){
-    for (let index = 0; index < 7; index++) {
-      let columna_div = $('.col-'+index)
-      for (let index2 = 0; index2 < 7; index2++) {
-        columna_div.attr("id", "imagen-" + String(index) + String(index2))
-      }
+    for (let index = 1; index < 8; index++) {
+      let columna_div = 
+      $.each($('.col-'+index).children(), function(index2, value) {
+        console.log($(this).attr('id', 'imagen-' + String(index-1) + String(7-index2-1)))
+      })      
     }
+  }
+
+  function allowDrop(ev) {
+    ev.preventDefault();
+  }
+  
+  function drag(ev) {
+    ev.dataTransfer.setData("imagen_origen", ev.target.src);
+    ev.dataTransfer.setData("id_origen", ev.target.id);   
+  }
+  
+  function drop(ev) {
+    ev.preventDefault();
+    var imagen_origen = ev.dataTransfer.getData("imagen_origen");
+    var id_origen = ev.dataTransfer.getData("id_origen")
+    $('#'+id_origen).attr("src", ev.target.src())
+    ev.target.src(imagen_origen);
   }
 
   function barrido_tablero(matriz){
